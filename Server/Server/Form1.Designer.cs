@@ -38,6 +38,7 @@
             this.sendmsg = new System.Windows.Forms.TextBox();
             this.userList = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.tip = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -131,12 +132,21 @@
             this.label2.TabIndex = 8;
             this.label2.Text = "用户列表";
             // 
+            // tip
+            // 
+            this.tip.AutoSize = true;
+            this.tip.Location = new System.Drawing.Point(169, 17);
+            this.tip.Name = "tip";
+            this.tip.Size = new System.Drawing.Size(0, 12);
+            this.tip.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(630, 464);
+            this.Controls.Add(this.tip);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.userList);
             this.Controls.Add(this.sendmsg);
@@ -168,6 +178,7 @@
         private System.Windows.Forms.TextBox sendmsg;
         private System.Windows.Forms.ListBox userList;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label tip;
     }
 }
 
