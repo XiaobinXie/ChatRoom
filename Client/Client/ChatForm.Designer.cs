@@ -68,7 +68,7 @@
             this.Controls.Add(this.MsgToSend);
             this.Controls.Add(this.Msg_Box);
             this.Name = "ChatForm";
-            this.Text = "ChatForm";
+            this.Text = "ChatRoom";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ChatForm_FormClosed);
             this.Load += new System.EventHandler(this.ChatForm_Load);
             this.ResumeLayout(false);

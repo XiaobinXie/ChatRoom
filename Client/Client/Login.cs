@@ -52,8 +52,11 @@ namespace Client
             int i = UsrInfo.NewClient.Send(data);
             data = Encoding.UTF8.GetBytes(Account.Text + "@" + Password.Text);
             i = UsrInfo.NewClient.Send(data);
-            int recv = UsrInfo.NewClient.Receive(data);
-            string stringdata = Encoding.UTF8.GetString(data, 0, recv);
+            Thread.Sleep(100);
+
+            byte[] temp = new byte[100];
+            int recv = UsrInfo.NewClient.Receive(temp);
+            string stringdata = Encoding.UTF8.GetString(temp, 0, recv);
             if (stringdata == "YES")
             {
                 this.Hide();
@@ -61,15 +64,15 @@ namespace Client
                 ChatForm ChatForm = new ChatForm();
                 ChatForm.Show();
             }
-            else if (stringdata == "NO")
+            else
             {
                 tip.Text = "账号或密码错误";
+                Account.Text = "";
+                Password.Text = "";
             }
         }
         public void Register()
         {
-            Register_Link.Text = "";
-            Login_Bt.Text = "注册";
             byte[] data = new byte[100];
             data = Encoding.UTF8.GetBytes("REGISTER@123");
             int i = UsrInfo.NewClient.Send(data);
@@ -87,17 +90,28 @@ namespace Client
 
         private void Login_Load(object sender, EventArgs e)
         {
+            Register_R.Hide();
             Connect();
         }
 
         private void Login_FormClosed(object sender, FormClosedEventArgs e)
         {
+            byte[] data = new byte[4];
+            data = System.Text.Encoding.Default.GetBytes("STOP@STOP");
+            int i = UsrInfo.NewClient.Send(data);
             UsrInfo.NewClient.Close();
         }
 
         private void Register_Link_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            //Register();
+            Register_Link.Text = "";
+            Login_Bt.Hide();
+            Register_R.Show();
+        }
+
+        private void Register_R_Click(object sender, EventArgs e)
+        {
+            Register();
         }
     }
 }

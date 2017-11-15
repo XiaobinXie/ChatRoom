@@ -35,11 +35,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.tip = new System.Windows.Forms.Label();
+            this.Register_R = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Login_Bt
             // 
-            this.Login_Bt.Location = new System.Drawing.Point(62, 121);
+            this.Login_Bt.Location = new System.Drawing.Point(62, 132);
             this.Login_Bt.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Login_Bt.Name = "Login_Bt";
             this.Login_Bt.Size = new System.Drawing.Size(151, 33);
@@ -67,7 +68,7 @@
             // Register_Link
             // 
             this.Register_Link.AutoSize = true;
-            this.Register_Link.Location = new System.Drawing.Point(80, 198);
+            this.Register_Link.Location = new System.Drawing.Point(83, 216);
             this.Register_Link.Name = "Register_Link";
             this.Register_Link.Size = new System.Drawing.Size(104, 17);
             this.Register_Link.TabIndex = 3;
@@ -96,16 +97,29 @@
             // tip
             // 
             this.tip.AutoSize = true;
-            this.tip.Location = new System.Drawing.Point(108, 234);
+            this.tip.Font = new System.Drawing.Font("微软雅黑", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.tip.Location = new System.Drawing.Point(3, 235);
             this.tip.Name = "tip";
-            this.tip.Size = new System.Drawing.Size(0, 17);
+            this.tip.Size = new System.Drawing.Size(0, 16);
             this.tip.TabIndex = 6;
+            // 
+            // Register_R
+            // 
+            this.Register_R.Location = new System.Drawing.Point(62, 158);
+            this.Register_R.Name = "Register_R";
+            this.Register_R.Size = new System.Drawing.Size(151, 33);
+            this.Register_R.TabIndex = 7;
+            this.Register_R.Text = "注册";
+            this.Register_R.UseVisualStyleBackColor = true;
+            this.Register_R.Click += new System.EventHandler(this.Register_R_Click);
             // 
             // Login
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(267, 260);
+            this.Controls.Add(this.Register_R);
             this.Controls.Add(this.tip);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
@@ -116,7 +130,7 @@
             this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Login";
-            this.Text = "Form1";
+            this.Text = "ChatRoom";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Login_FormClosed);
             this.Load += new System.EventHandler(this.Login_Load);
             this.ResumeLayout(false);
@@ -133,6 +147,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label tip;
+        private System.Windows.Forms.Button Register_R;
     }
 }
 

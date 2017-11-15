@@ -39,6 +39,7 @@ namespace TCPServer
         public UsrInfo[] FILE = new UsrInfo[100];
         public int count = 0;
         public string client_name;
+
         public void register(string nickname, string password, EndPoint clientip)//注册
         {
             FILE[count].NickName = nickname;
@@ -167,26 +168,28 @@ namespace TCPServer
             server1 = (Socket)ar.AsyncState;
             Client = server1.EndAccept(ar);
             remote = Client.RemoteEndPoint;
+            server1.BeginAccept(new AsyncCallback(OnConnectRequest), server1); //等待新的客户端连接
+
             byte[] YES = System.Text.Encoding.UTF8.GetBytes("YES");
-            byte[] NO = System.Text.Encoding.UTF8.GetBytes("NO");
+            byte[] NO_bool = System.Text.Encoding.UTF8.GetBytes("BUBING");
             //开始进行登陆与注册工作
-            Spare();
             bool a=true;
            while (a)
             {
+                Spare();
                 if (msg1 == "LOGIN")
                 {
                     tip.Text = "1";
                     Spare();
                     if (login(msg1, msg2, remote))
                     {
-                        Client.Send(YES, YES.Length, 0);
-                        a = false;
+                        Client.SendTo(YES, remote);
                         tip.Text = "2";
+                        a = false;
                     }
                     else{
+                        //Client.SendTo(NO_bool, remote);
                         tip.Text = "3";
-                        Client.Send(NO, NO.Length, 0);
                     }
                 }
                 else if (msg1 == "REGISTER")
@@ -196,17 +199,17 @@ namespace TCPServer
                     a = false;
                 }
             }
-            
+            Thread.Sleep(300);
             //将要发送给连接上来的客户端的提示字符串
             DateTimeOffset now = DateTimeOffset.Now;
-            string strDateLine = "欢迎登录到服务器@ ";
+            string strDateLine = "管理员@"+msg1+"，欢迎登录到服务器!";
             Byte[] byteDateLine = System.Text.Encoding.UTF8.GetBytes(strDateLine);
             //将提示信息发送给客户端,并在服务端显示连接信息。
             showClientMsg(Client.RemoteEndPoint.ToString() + "连接成功。" + now.ToString("G") + "\r\n");
             Client.Send(byteDateLine, byteDateLine.Length, 0);
             //userListOperate(Client.RemoteEndPoint.ToString());    
              
-           server1.BeginAccept(new AsyncCallback(OnConnectRequest), server1); //等待新的客户端连接
+           
             while (true)
             {
                 Spare();
