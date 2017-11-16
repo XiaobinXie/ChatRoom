@@ -33,7 +33,6 @@ namespace TCPServer
         {
             public string NickName;
             public string password;
-            public Socket Usr_Socket;
             public EndPoint clientip;
             public bool connected;
         }
@@ -46,7 +45,6 @@ namespace TCPServer
             FILE[count].NickName = nickname;
             FILE[count].password = password;
             FILE[count].clientip = clientip;
-            FILE[count].Usr_Socket = Client;
             count++;
         }
         public bool login(string nickname, string password, EndPoint clientip)//登陆
@@ -60,9 +58,14 @@ namespace TCPServer
                     temp = true;
                     FILE[i].clientip = clientip;
                     FILE[i].connected = true;
-                    FILE[i].Usr_Socket = Client;
                     break;
                 }
+            }
+            if (temp == false)
+            {
+                byte[] data = new byte[1024];
+                data = Encoding.UTF8.GetBytes("账号或密码错误");
+                int i = Client.Send(data);
             }
             return temp;
         }
@@ -161,13 +164,17 @@ namespace TCPServer
         //当有客户端连接时的处理
         public void OnConnectRequest(IAsyncResult ar)
         {
+            //初始化一个SOCKET，用于其它客户端的连接
             server1 = (Socket)ar.AsyncState;
-            Socket Client = server1.EndAccept(ar);
+            Client = server1.EndAccept(ar);
             remote = Client.RemoteEndPoint;
+
+
+            
             server1.BeginAccept(new AsyncCallback(OnConnectRequest), server1); //等待新的客户端连接
 
             byte[] YES = System.Text.Encoding.UTF8.GetBytes("YES");
-            //byte[] NO_bool = System.Text.Encoding.UTF8.GetBytes("BUBING");
+            byte[] NO_bool = System.Text.Encoding.UTF8.GetBytes("BUBING");
             //开始进行登陆与注册工作
             bool a=true;
            while (a)
@@ -184,7 +191,7 @@ namespace TCPServer
                         a = false;
                     }
                     else{
-                        //temp_Client.SendTo(NO_bool, remote);
+                        //Client.SendTo(NO_bool, remote);
                         tip.Text = "3";
                     }
                 }
@@ -237,28 +244,25 @@ namespace TCPServer
         //以下实现发送广播消息
         public void SendBroadMsg()
         {
-            Socket New;
             string strDataLine = sendmsg.Text;
             Byte[] sendData = Encoding.UTF8.GetBytes("服务器"+"@"+strDataLine);
             for(int i=0;i<count;i++)
             {
                 EndPoint temp = FILE[i].clientip;
-                New = FILE[i].Usr_Socket;
-                New.SendTo(sendData, FILE[i].clientip);
+                Client.SendTo(sendData, temp);
             }
             sendmsg.Text = "";
         }
         public void TransMsg(string client_name,string msg)//转发客户端消息
         {
-            Socket New;
+            
             for(int i=0;i<count;i++)
             {
                 msg = msg+"@"+FILE[i].NickName;
                 Byte[] sendData = Encoding.UTF8.GetBytes(msg);
                 if (FILE[i].NickName != msg1&&FILE[i].connected==true)
                 {
-                    New = FILE[i].Usr_Socket;
-                    New.SendTo(sendData, FILE[i].clientip);
+                    Client.SendTo(sendData, FILE[i].clientip);
                 }
             }
         }
