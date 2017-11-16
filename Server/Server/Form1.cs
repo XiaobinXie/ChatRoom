@@ -28,6 +28,7 @@ namespace TCPServer
         public string ClientName;
         public string msg1, msg2;
 
+
         //登陆及注册处理
         public struct UsrInfo
         {
@@ -45,6 +46,7 @@ namespace TCPServer
             FILE[count].NickName = nickname;
             FILE[count].password = password;
             FILE[count].clientip = clientip;
+            FILE[count].connected = true;
             count++;
         }
         public bool login(string nickname, string password, EndPoint clientip)//登陆
@@ -61,12 +63,6 @@ namespace TCPServer
                     break;
                 }
             }
-            if (temp == false)
-            {
-                byte[] data = new byte[1024];
-                data = Encoding.UTF8.GetBytes("账号或密码错误");
-                int i = Client.Send(data);
-            }
             return temp;
         }
         public void ReadFile()
@@ -80,29 +76,39 @@ namespace TCPServer
                 temp = line.ToString().Split('@');
                 FILE[count].NickName = temp[0];
                 FILE[count].password = temp[1];
+                FILE[count].connected = false;
                 count++;
-                showClientMsg(temp[0]);
-                showClientMsg(temp[1]);
+                showClientMsg(temp[0]+" ");
+                showClientMsg(temp[1]+"\n");
             }
             sr.Close();
         }
         public void WriteFile()
         {
             string path = "C:\\Users\\Administrator\\Desktop\\UsrInfo.txt";
-            FileStream fs = new FileStream(path, FileMode.Create);
+            StreamWriter fs = new StreamWriter(path);
             //获得字节数组
             for(int i = 0; i < count; i++)
             {
                 string UsrInfo = FILE[i].NickName+"@"+FILE[i].password;
-                byte[] data = new UTF8Encoding().GetBytes(UsrInfo);
-                fs.Write(data, 0, data.Length);
+                fs.WriteLine(UsrInfo);
             }
                        
             //清空缓冲区、关闭流
             fs.Flush();
             fs.Close();
         }
-
+        public void setStatus(string temp_name, bool temp_bool)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                if (FILE[i].NickName == temp_name)
+                {
+                    FILE[i].connected = temp_bool;
+                    break;
+                }
+            }
+        }
         public bool m_Listening;
         //用来设置服务端监听的端口号
         public int setPort
@@ -168,16 +174,13 @@ namespace TCPServer
             server1 = (Socket)ar.AsyncState;
             Client = server1.EndAccept(ar);
             remote = Client.RemoteEndPoint;
-
-
-            
             server1.BeginAccept(new AsyncCallback(OnConnectRequest), server1); //等待新的客户端连接
 
             byte[] YES = System.Text.Encoding.UTF8.GetBytes("YES");
             byte[] NO_bool = System.Text.Encoding.UTF8.GetBytes("BUBING");
             //开始进行登陆与注册工作
             bool a=true;
-           while (a)
+            while (a)
             {
                 Spare();
                 if (msg1 == "LOGIN")
@@ -188,6 +191,7 @@ namespace TCPServer
                     {
                         Client.SendTo(YES, remote);
                         tip.Text = "2";
+                        setStatus(msg1, true);
                         a = false;
                     }
                     else{
@@ -202,7 +206,6 @@ namespace TCPServer
                     a = false;
                 }
             }
-            Thread.Sleep(300);
             //将要发送给连接上来的客户端的提示字符串
             DateTimeOffset now = DateTimeOffset.Now;
             string strDateLine = "管理员@"+msg1+"，欢迎登录到服务器!";
@@ -221,9 +224,10 @@ namespace TCPServer
 
                 if (msg2 == "STOP")
                 {
+                    bool b=true;
                     //当客户端终止连接时
                     showClientMsg(client_name + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
-
+                    setStatus(msg1, b);
                     break;
                 }
                 //显示客户端发送过来的信息
@@ -248,8 +252,10 @@ namespace TCPServer
             Byte[] sendData = Encoding.UTF8.GetBytes("服务器"+"@"+strDataLine);
             for(int i=0;i<count;i++)
             {
-                EndPoint temp = FILE[i].clientip;
-                Client.SendTo(sendData, temp);
+                if (FILE[i].connected)
+                {
+                    Client.Send(sendData);
+                }
             }
             sendmsg.Text = "";
         }
