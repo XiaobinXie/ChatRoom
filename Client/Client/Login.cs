@@ -36,13 +36,13 @@ namespace Client
             try
             {
                 UsrInfo.NewClient.Connect(ie);
+                tip.Text = "连接成功";
             }
             catch (SocketException e)
             {
                 MessageBox.Show("connect failed" + e.Message);
                 return;
             }
-            tip.Text = "连接成功";
         }
         public void Check_Account()
         {
