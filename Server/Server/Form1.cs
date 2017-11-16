@@ -77,22 +77,22 @@ namespace TCPServer
                 temp = line.ToString().Split('@');
                 FILE[count].NickName = temp[0];
                 FILE[count].password = temp[1];
-                FILE[count].connected = false;
                 count++;
-                //showClientMsg(temp[0]);
-                //showClientMsg(temp[1]);
+                showClientMsg(temp[0]);
+                showClientMsg(temp[1]);
             }
             sr.Close();
         }
         public void WriteFile()
         {
             string path = "C:\\Users\\Administrator\\Desktop\\UsrInfo.txt";
-            StreamWriter fs = new StreamWriter(path);
+            FileStream fs = new FileStream(path, FileMode.Create);
             //获得字节数组
             for(int i = 0; i < count; i++)
             {
                 string UsrInfo = FILE[i].NickName+"@"+FILE[i].password;
-                fs.WriteLine(UsrInfo);
+                byte[] data = new UTF8Encoding().GetBytes(UsrInfo);
+                fs.Write(data, 0, data.Length);
             }
                        
             //清空缓冲区、关闭流
@@ -181,7 +181,6 @@ namespace TCPServer
                     {
                         Client.SendTo(YES, remote);
                         tip.Text = "2";
-                        setStatus(msg1, true);
                         a = false;
                     }
                     else{
@@ -193,7 +192,6 @@ namespace TCPServer
                 {
                     Spare();
                     register(msg1, msg2, remote);
-                    setStatus(msg1, true);
                     a = false;
                 }
             }
@@ -217,8 +215,8 @@ namespace TCPServer
                 if (msg2 == "STOP")
                 {
                     //当客户端终止连接时
-                    showClientMsg(msg1 + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
-                    setStatus(msg1,false);
+                    showClientMsg(client_name + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
+
                     break;
                 }
                 //显示客户端发送过来的信息
@@ -226,14 +224,6 @@ namespace TCPServer
                 TransMsg(msg1,msg2);
             }
 
-        }
-        public void setStatus(string name,bool set_bool)
-        {
-            for(int i = 0; i < count; i++)
-            {
-                if (FILE[i].NickName == name)
-                    FILE[i].connected = set_bool;
-            }
         }
         public void Spare()
         {
@@ -263,9 +253,9 @@ namespace TCPServer
             Socket New;
             for(int i=0;i<count;i++)
             {
-                msg = FILE[i].NickName+"@"+msg;
+                msg = msg+"@"+FILE[i].NickName;
                 Byte[] sendData = Encoding.UTF8.GetBytes(msg);
-                if (FILE[i].NickName != client_name&&FILE[i].connected==true)
+                if (FILE[i].NickName != msg1&&FILE[i].connected==true)
                 {
                     New = FILE[i].Usr_Socket;
                     New.SendTo(sendData, FILE[i].clientip);
@@ -294,7 +284,7 @@ namespace TCPServer
                 //停止服务（绑定的套接字没有关闭,因此客户端还是可以连接上来）
                 myThread.Interrupt();
                 myThread.Abort();
-                WriteFile();
+
                 //showClientMsg("服务器已停止服务"+"\r\n");
                 btnstatu = true;
                 startService.Text = "开始服务";

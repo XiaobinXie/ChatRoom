@@ -22,7 +22,8 @@ namespace Client
         public class UsrInfo{
             public static string Account;
             public static string Password;
-            public static Socket NewClient; 
+            public static Socket NewClient;
+            
         }
         public bool Connected=false;
         public Thread myThread;
