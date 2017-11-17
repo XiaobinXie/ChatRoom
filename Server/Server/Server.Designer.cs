@@ -36,8 +36,6 @@
             this.statuBar = new System.Windows.Forms.ToolStripStatusLabel();
             this.send = new System.Windows.Forms.Button();
             this.sendmsg = new System.Windows.Forms.TextBox();
-            this.userList = new System.Windows.Forms.ListBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.tip = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -66,7 +64,7 @@
             this.showinfo.Cursor = System.Windows.Forms.Cursors.No;
             this.showinfo.Location = new System.Drawing.Point(20, 58);
             this.showinfo.Name = "showinfo";
-            this.showinfo.Size = new System.Drawing.Size(406, 254);
+            this.showinfo.Size = new System.Drawing.Size(469, 301);
             this.showinfo.TabIndex = 2;
             this.showinfo.Text = "";
             // 
@@ -86,7 +84,7 @@
             this.statuBar});
             this.statusStrip1.Location = new System.Drawing.Point(0, 442);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(630, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(501, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -98,7 +96,7 @@
             // 
             // send
             // 
-            this.send.Location = new System.Drawing.Point(240, 365);
+            this.send.Location = new System.Drawing.Point(402, 365);
             this.send.Name = "send";
             this.send.Size = new System.Drawing.Size(87, 25);
             this.send.TabIndex = 5;
@@ -110,27 +108,8 @@
             // 
             this.sendmsg.Location = new System.Drawing.Point(20, 368);
             this.sendmsg.Name = "sendmsg";
-            this.sendmsg.Size = new System.Drawing.Size(175, 21);
+            this.sendmsg.Size = new System.Drawing.Size(376, 21);
             this.sendmsg.TabIndex = 6;
-            // 
-            // userList
-            // 
-            this.userList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.userList.FormattingEnabled = true;
-            this.userList.ItemHeight = 12;
-            this.userList.Location = new System.Drawing.Point(476, 59);
-            this.userList.Name = "userList";
-            this.userList.Size = new System.Drawing.Size(123, 242);
-            this.userList.TabIndex = 7;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(474, 22);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(53, 12);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "用户列表";
             // 
             // tip
             // 
@@ -145,10 +124,8 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(630, 464);
+            this.ClientSize = new System.Drawing.Size(501, 464);
             this.Controls.Add(this.tip);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.userList);
             this.Controls.Add(this.sendmsg);
             this.Controls.Add(this.send);
             this.Controls.Add(this.statusStrip1);
@@ -176,8 +153,6 @@
         private System.Windows.Forms.ToolStripStatusLabel statuBar;
         private System.Windows.Forms.Button send;
         private System.Windows.Forms.TextBox sendmsg;
-        private System.Windows.Forms.ListBox userList;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label tip;
     }
 }

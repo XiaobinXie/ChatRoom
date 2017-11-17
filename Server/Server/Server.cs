@@ -4,8 +4,6 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 
 namespace TCPServer
@@ -25,100 +23,95 @@ namespace TCPServer
         public IPEndPoint localEP;
         public int localPort;
         public EndPoint remote;
-        public string ClientName;
-        public string msg1, msg2;
+        public string msg1, msg2;//消息分段
 
-
-        //登陆及注册处理
+        
+        /*登陆及注册处理*/
+        
         public struct UsrInfo
         {
-            public string NickName;
-            public string password;
-            public EndPoint clientip;
-            public bool connected;
+            public string Account;
+            public string Password;
+            public int Connected;
             public Socket UsrSocket;
         }
-        public UsrInfo[] FILE = new UsrInfo[100];
+        public UsrInfo[] FILE = new UsrInfo[100];//用户信息
         public int count = 0;
-        public string client_name;
 
-        public void register(string nickname, string password, Socket tempSocket)//注册
+        public void register(string nickname, string Password, Socket tempSocket)//注册
         {
-            FILE[count].NickName = nickname;
-            FILE[count].password = password;
+            FILE[count].Account = nickname;
+            FILE[count].Password = Password;
             FILE[count].UsrSocket = tempSocket;
-            FILE[count].connected = true;
+            FILE[count].Connected = 1;
             count++;
         }
-        public bool login(string nickname, string password, Socket tempSocket)//登陆
+        public bool login(string nickname, string Password, Socket tempSocket)//验证登陆
         {
             bool temp = false;
             for (int i = 0;i<count ; i++)
             {
-                if (FILE[i].NickName == null) break;
-                else if (FILE[i].NickName == nickname && FILE[i].password == password)
+                if (FILE[i].Account == null) break;
+                else if (FILE[i].Account == nickname && FILE[i].Password == Password)
                 {
                     temp = true;
                     FILE[i].UsrSocket = tempSocket;
-                    FILE[i].connected = true;
+                    FILE[i].Connected = 1;
                     break;
                 }
             }
             return temp;
         }
-        public void ReadFile()
+        public void ReadFile()//读取本地服务器用户信息
         {
-            string path = "C:\\Users\\Administrator\\Desktop\\UsrInfo.txt"; 
+            string path = @"UsrInfo.txt"; 
             StreamReader sr = new StreamReader(path,Encoding.UTF8);
             String line;
             string[] temp = new string[2];
             while ((line = sr.ReadLine()) != null)
             {
                 temp = line.ToString().Split('@');
-                FILE[count].NickName = temp[0];
-                FILE[count].password = temp[1];
-                FILE[count].connected = false;
+                FILE[count].Account = temp[0];
+                FILE[count].Password = temp[1];
+                FILE[count].Connected = 0;
                 count++;
                 showClientMsg(temp[0]+" ");
                 showClientMsg(temp[1]+"\n");
             }
             sr.Close();
         }
-        public void WriteFile()
+        public void WriteFile()//将用户信息写入文件
         {
-            string path = "C:\\Users\\Administrator\\Desktop\\UsrInfo.txt";
+            string path = @"UsrInfo.txt";
             StreamWriter fs = new StreamWriter(path);
-            //获得字节数组
             for(int i = 0; i < count; i++)
             {
-                string UsrInfo = FILE[i].NickName+"@"+FILE[i].password;
+                string UsrInfo = FILE[i].Account+"@"+FILE[i].Password;
                 fs.WriteLine(UsrInfo);
             }
-                       
-            //清空缓冲区、关闭流
             fs.Flush();
             fs.Close();
         }
-        public void setStatus(string temp_name, bool temp_bool)
+        public void setStatus(string temp_name, int temp)//设置在线或下线状态
         {
             for (int i = 0; i < count; i++)
             {
-                if (FILE[i].NickName == temp_name)
+                if (FILE[i].Account == temp_name)
                 {
-                    FILE[i].connected = temp_bool;
+                    FILE[i].Connected = temp;
                     break;
                 }
             }
         }
-        public bool m_Listening;
         //用来设置服务端监听的端口号
+        public bool m_Listening;
         public int setPort
         {
             get { return localPort; }
             set { localPort = value; }
         }
-        //用来往richtextbox框中显示消息
-        public void showClientMsg(string msg)
+        
+        public void showClientMsg(string msg)//显示客户端消息
         {
             //在线程里以安全方式调用控件
             if (showinfo.InvokeRequired)
@@ -131,7 +124,7 @@ namespace TCPServer
                 showinfo.AppendText(msg);
             }
         }
-        public void userListOperate(string msg)
+        /*public void userListOperate(string msg)//后期可能会添加的客户端信息列表
         {
             //在线程里以安全方式调用控件
             if (userList.InvokeRequired)
@@ -143,9 +136,12 @@ namespace TCPServer
             {
                 userList.Items.Add(msg);
             }
-        }
-        //监听函数
-        public void Listen()
+        }*/
+        
+
+        /*监听客户端及接受消息*/
+        
+        public void Listen()//监听函数
         {   //设置端口
             setPort = int.Parse(serverport.Text.Trim());
             //初始化SOCKET实例
@@ -168,19 +164,19 @@ namespace TCPServer
                 showClientMsg(ex.Message);
             }
         }
-        //当有客户端连接时的处理
-        public void OnConnectRequest(IAsyncResult ar)
+        
+        public void OnConnectRequest(IAsyncResult ar)//当有客户端连接时的处理
         {
             //初始化一个SOCKET，用于其它客户端的连接
             server1 = (Socket)ar.AsyncState;
             Client = server1.EndAccept(ar);
             remote = Client.RemoteEndPoint;
             server1.BeginAccept(new AsyncCallback(OnConnectRequest), server1); //等待新的客户端连接
-
-            Socket tempSocket=Client;
+            Socket tempSocket=Client;//将全局变量与线程分开，避免冲突
 
             //开始进行登陆与注册工作
             byte[] YES = System.Text.Encoding.UTF8.GetBytes("YES");
+            byte[] NO = System.Text.Encoding.UTF8.GetBytes("NO");
             bool a=true;
             while (a)
             {
@@ -193,11 +189,11 @@ namespace TCPServer
                     {
                         tempSocket.SendTo(YES, remote);
                         tip.Text = "2";
-                        setStatus(msg1, true);
+                        setStatus(msg1, 1);
                         a = false;
                     }
                     else{
-                        //Client.SendTo(NO_bool, remote);
+                        Client.SendTo(NO, remote);
                         tip.Text = "3";
                     }
                 }
@@ -207,38 +203,39 @@ namespace TCPServer
                     register(msg1, msg2, tempSocket);
                     a = false;
                 }
+                else if (msg1 == "STOP")
+                {
+                    break;
+                }
             }
+
             //将要发送给连接上来的客户端的提示字符串
             DateTimeOffset now = DateTimeOffset.Now;
             string strDateLine = "管理员@"+msg1+"，欢迎登录到服务器!";
             Byte[] byteDateLine = System.Text.Encoding.UTF8.GetBytes(strDateLine);
+
             //将提示信息发送给客户端,并在服务端显示连接信息。
             showClientMsg(tempSocket.RemoteEndPoint.ToString() + "连接成功。" + now.ToString("G") + "\r\n");
             tempSocket.Send(byteDateLine, byteDateLine.Length, 0);
             //userListOperate(Client.RemoteEndPoint.ToString());    
              
-           
+           //接受消息
             while (true)
             {
                 Spare(tempSocket);
-                string ip = tempSocket.RemoteEndPoint.ToString();
-                //获取客户端的IP和端口
-
-                if (msg2 == "STOP")
+                string ip = tempSocket.RemoteEndPoint.ToString();//获取客户端的IP和端口
+                if (msg1 == "STOP")//当客户端终止连接时
                 {
-                    bool b=false;
-                    //当客户端终止连接时
-                    showClientMsg(client_name + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
-                    setStatus(msg1, b);
+                    showClientMsg(msg2 + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
+                    setStatus(msg1, 0);
                     break;
                 }
-                //显示客户端发送过来的信息
-                showClientMsg(ip + "  " + now.ToString("G") + "   " + msg2 + "\r\n");
-                TransMsg(msg1,msg2);
+                showClientMsg(ip + "  " + now.ToString("G") + "   " + msg2 + "\r\n");//显示客户端发送过来的信息
+                TransMsg(msg1,msg2);//转发消息
             }
 
         }
-        public void Spare(Socket tempSocket)
+        public void Spare(Socket tempSocket)//分离账号及消息
         {
             byte[] data = new byte[1024];
             int recv = tempSocket.Receive(data);
@@ -247,17 +244,17 @@ namespace TCPServer
                 msg1 = temp[0];
                 msg2 = temp[1];
         }
-        //以下实现发送广播消息
-        public void SendBroadMsg()
+        
+        public void SendBroadMsg()//发送广播消息
         {
             string strDataLine = sendmsg.Text;
             Byte[] sendData = Encoding.UTF8.GetBytes("服务器"+"@"+strDataLine);
             
             for(int i=0;i<count;i++)
             {
-                bool temp=FILE[i].connected;
+                int temp=FILE[i].Connected;
                 Socket tempSocket=FILE[i].UsrSocket;
-                if (temp)
+                if (temp==1)
                 {
                     tempSocket.Send(sendData);
                 }
@@ -270,7 +267,7 @@ namespace TCPServer
             {
                 msg = msg1+"@"+msg2;
                 Byte[] sendData = Encoding.UTF8.GetBytes(msg);
-                if (FILE[i].NickName != msg1&&FILE[i].connected==true)
+                if (FILE[i].Account != msg1&&FILE[i].Connected==1)
                 {
                     FILE[i].UsrSocket.Send(sendData);
                 }

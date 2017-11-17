@@ -20,13 +20,13 @@ namespace Client
         {
             InitializeComponent();
         }
-        public void connect()
+        public void connect()//开启线程
         {
             ThreadStart myThread_delegate = new ThreadStart(ReceiveMsg);
             myThread = new Thread(myThread_delegate);
             myThread.Start();
         }
-        public void ReceiveMsg()
+        public void ReceiveMsg()//接受消息
         {
             while (true)
             {
@@ -37,7 +37,7 @@ namespace Client
                 ShowMsg(msg1 +":"+msg2+ "\r\n");
             }
         }
-        public void ShowMsg(string msg)
+        public void ShowMsg(string msg)//显示消息
         {
             {
                 if (Msg_Box.InvokeRequired)
@@ -71,7 +71,7 @@ namespace Client
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             byte[] data = new byte[4];
-            data = System.Text.Encoding.Default.GetBytes("STOP@STOP");
+            data = System.Text.Encoding.Default.GetBytes("STOP@"+ account);
             int i = Chat_Client.Send(data);
             Chat_Client.Close();
         }

@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Client
@@ -19,16 +13,14 @@ namespace Client
         {
             InitializeComponent();
         }
-        public class UsrInfo{
+        public class UsrInfo
+        {//设置全局变量，方便多窗口
             public static string Account;
             public static string Password;
             public static Socket NewClient;
-            
         }
-        public bool Connected=false;
-        public Thread myThread;
-        public Socket Newclient;
-        public void Connect()
+     
+        public void Connect()//在程序启动后，开始连接
         {
             UsrInfo.NewClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             string ip = "60.205.176.169";
@@ -37,29 +29,28 @@ namespace Client
             try
             {
                 UsrInfo.NewClient.Connect(ie);
+                tip.Text = "连接成功";
             }
             catch (SocketException e)
             {
-                MessageBox.Show("connect failed" + e.Message);
+                MessageBox.Show("连接失败" + e.Message);
                 return;
             }
-            tip.Text = "连接成功";
         }
-        public void Check_Account()
+        public void Check_Account()//发送账号信息，验证账号
         {
             byte[] data = new byte[100];
-            data = Encoding.UTF8.GetBytes("LOGIN@123");
+            data = Encoding.UTF8.GetBytes("LOGIN@LOGIN");
             int i = UsrInfo.NewClient.Send(data);
             data = Encoding.UTF8.GetBytes(Account.Text + "@" + Password.Text);
             i = UsrInfo.NewClient.Send(data);
-            Thread.Sleep(100);
 
             byte[] temp = new byte[100];
             int recv = UsrInfo.NewClient.Receive(temp);
             string stringdata = Encoding.UTF8.GetString(temp, 0, recv);
             if (stringdata == "YES")
             {
-                this.Hide();
+                this.Hide();//隐藏登陆界面
                 UsrInfo.Account = Account.Text;
                 ChatForm ChatForm = new ChatForm();
                 ChatForm.Show();
@@ -71,14 +62,14 @@ namespace Client
                 Password.Text = "";
             }
         }
-        public void Register()
+        public void Register()//发送注册信息
         {
             byte[] data = new byte[100];
             data = Encoding.UTF8.GetBytes("REGISTER@123");
             int i = UsrInfo.NewClient.Send(data);
             data = Encoding.UTF8.GetBytes(Account.Text + "@" + Password.Text);
             i = UsrInfo.NewClient.Send(data);
-            this.Hide();
+            this.Hide();//隐藏注册界面
             UsrInfo.Account = Account.Text;
             ChatForm ChatForm = new ChatForm();
             ChatForm.Show();
