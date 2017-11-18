@@ -178,6 +178,7 @@ namespace TCPServer
             byte[] YES = System.Text.Encoding.UTF8.GetBytes("YES");
             byte[] NO = System.Text.Encoding.UTF8.GetBytes("NO");
             bool a=true;
+            int flag = 1;//设置客户端标记，避免服务器崩溃
             while (a)
             {
                 Spare(tempSocket);
@@ -203,8 +204,9 @@ namespace TCPServer
                     register(msg1, msg2, tempSocket);
                     a = false;
                 }
-                else if (msg1 == "STOP")
+                else
                 {
+                    flag = 0;
                     break;
                 }
             }
@@ -215,12 +217,13 @@ namespace TCPServer
             Byte[] byteDateLine = System.Text.Encoding.UTF8.GetBytes(strDateLine);
 
             //将提示信息发送给客户端,并在服务端显示连接信息。
-            showClientMsg(tempSocket.RemoteEndPoint.ToString() + "连接成功。" + now.ToString("G") + "\r\n");
-            tempSocket.Send(byteDateLine, byteDateLine.Length, 0);
-            //userListOperate(Client.RemoteEndPoint.ToString());    
-             
+            if (flag == 1) {
+                showClientMsg(tempSocket.RemoteEndPoint.ToString() + "连接成功。" + now.ToString("G") + "\r\n");
+                tempSocket.Send(byteDateLine, byteDateLine.Length, 0);
+                //userListOperate(Client.RemoteEndPoint.ToString());    
+            }
            //接受消息
-            while (true)
+            while (true&&flag==1)
             {
                 Spare(tempSocket);
                 string ip = tempSocket.RemoteEndPoint.ToString();//获取客户端的IP和端口

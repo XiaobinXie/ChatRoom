@@ -55,7 +55,7 @@
             this.serverport.Name = "serverport";
             this.serverport.Size = new System.Drawing.Size(65, 21);
             this.serverport.TabIndex = 1;
-            this.serverport.Text = "8081";
+            this.serverport.Text = "9001";
             // 
             // showinfo
             // 

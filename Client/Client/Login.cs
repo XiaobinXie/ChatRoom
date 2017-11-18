@@ -24,7 +24,7 @@ namespace Client
         {
             UsrInfo.NewClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             string ip = "60.205.176.169";
-            int port = 8081;
+            int port = 9001;
             IPEndPoint ie = new IPEndPoint(IPAddress.Parse(ip), port);
             try
             {
