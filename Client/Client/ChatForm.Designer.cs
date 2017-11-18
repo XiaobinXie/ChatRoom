@@ -36,24 +36,27 @@
             // 
             // Msg_Box
             // 
-            this.Msg_Box.Location = new System.Drawing.Point(12, 12);
+            this.Msg_Box.Location = new System.Drawing.Point(14, 17);
+            this.Msg_Box.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Msg_Box.Multiline = true;
             this.Msg_Box.Name = "Msg_Box";
-            this.Msg_Box.Size = new System.Drawing.Size(571, 362);
+            this.Msg_Box.Size = new System.Drawing.Size(495, 385);
             this.Msg_Box.TabIndex = 0;
             // 
             // MsgToSend
             // 
-            this.MsgToSend.Location = new System.Drawing.Point(12, 389);
+            this.MsgToSend.Location = new System.Drawing.Point(12, 415);
+            this.MsgToSend.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.MsgToSend.Name = "MsgToSend";
-            this.MsgToSend.Size = new System.Drawing.Size(469, 21);
+            this.MsgToSend.Size = new System.Drawing.Size(397, 23);
             this.MsgToSend.TabIndex = 1;
             // 
             // Send
             // 
-            this.Send.Location = new System.Drawing.Point(508, 389);
+            this.Send.Location = new System.Drawing.Point(422, 410);
+            this.Send.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Send.Name = "Send";
-            this.Send.Size = new System.Drawing.Size(75, 23);
+            this.Send.Size = new System.Drawing.Size(87, 33);
             this.Send.TabIndex = 2;
             this.Send.Text = "发送";
             this.Send.UseVisualStyleBackColor = true;
@@ -61,12 +64,15 @@
             // 
             // ChatForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AcceptButton = this.Send;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(595, 422);
+            this.ClientSize = new System.Drawing.Size(523, 451);
             this.Controls.Add(this.Send);
             this.Controls.Add(this.MsgToSend);
             this.Controls.Add(this.Msg_Box);
+            this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "ChatForm";
             this.Text = "ChatRoom";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ChatForm_FormClosed);

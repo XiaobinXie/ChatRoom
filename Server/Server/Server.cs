@@ -45,6 +45,7 @@ namespace TCPServer
             FILE[count].UsrSocket = tempSocket;
             FILE[count].Connected = 1;
             count++;
+            WriteFile();
         }
         public bool login(string nickname, string Password, Socket tempSocket)//验证登陆
         {
@@ -190,7 +191,6 @@ namespace TCPServer
                     {
                         tempSocket.SendTo(YES, remote);
                         tip.Text = "2";
-                        setStatus(msg1, 1);
                         a = false;
                     }
                     else{
@@ -202,6 +202,7 @@ namespace TCPServer
                 {
                     Spare(tempSocket);
                     register(msg1, msg2, tempSocket);
+                    //WriteFile();
                     a = false;
                 }
                 else
@@ -227,16 +228,21 @@ namespace TCPServer
             {
                 Spare(tempSocket);
                 string ip = tempSocket.RemoteEndPoint.ToString();//获取客户端的IP和端口
-                if (msg1 == "STOP")//当客户端终止连接时
+                if (msg1 == "STOP")//当客户端终止连接时，消息格式：STOP@账户名
                 {
                     showClientMsg(msg2 + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
-                    setStatus(msg1, 0);
+                    setStatus(msg2, 0);
+                    tempSocket.Close();
+                    tip.Text = "6";
                     break;
                 }
                 showClientMsg(ip + "  " + now.ToString("G") + "   " + msg2 + "\r\n");//显示客户端发送过来的信息
                 TransMsg(msg1,msg2);//转发消息
             }
-
+            if (flag == 0)
+            {
+                tempSocket.Close();
+            }          
         }
         public void Spare(Socket tempSocket)//分离账号及消息
         {
@@ -251,7 +257,7 @@ namespace TCPServer
         public void SendBroadMsg()//发送广播消息
         {
             string strDataLine = sendmsg.Text;
-            Byte[] sendData = Encoding.UTF8.GetBytes("服务器"+"@"+strDataLine);
+            Byte[] sendData = Encoding.UTF8.GetBytes("管理员"+"@"+strDataLine);
             
             for(int i=0;i<count;i++)
             {
@@ -268,11 +274,19 @@ namespace TCPServer
         {
             for(int i=0;i<count;i++)
             {
-                msg = msg1+"@"+msg2;
+                msg = msg1 + "@"+msg2;
                 Byte[] sendData = Encoding.UTF8.GetBytes(msg);
-                if (FILE[i].Account != msg1&&FILE[i].Connected==1)
+                if (FILE[i].Account != client_name && FILE[i].Connected==1)
                 {
-                    FILE[i].UsrSocket.Send(sendData);
+                    try
+                    {
+                        FILE[i].UsrSocket.Send(sendData);
+                    }
+                    catch (SocketException e)
+                    {
+                        MessageBox.Show(e.Message);
+                        return;
+                    }
                 }
             }
         }
@@ -315,6 +329,12 @@ namespace TCPServer
                 myThread.Abort();
             }
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
         private void send_Click(object sender, EventArgs e)
         {
             SendBroadMsg();
