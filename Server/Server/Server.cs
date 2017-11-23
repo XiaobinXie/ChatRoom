@@ -247,7 +247,16 @@ namespace TCPServer
         public void Spare(Socket tempSocket)//分离账号及消息
         {
             byte[] data = new byte[1024];
-            int recv = tempSocket.Receive(data);
+            int recv;
+            try
+            {
+                recv = tempSocket.Receive(data);
+            }
+            catch (SocketException e)
+            {
+                MessageBox.Show(e.Message);
+                return;
+            }
             string stringdata = Encoding.UTF8.GetString(data, 0, recv);
             string[] temp = stringdata.Split('@');
                 msg1 = temp[0];
@@ -265,7 +274,15 @@ namespace TCPServer
                 Socket tempSocket=FILE[i].UsrSocket;
                 if (temp==1)
                 {
-                    tempSocket.Send(sendData);
+                    try
+                    {
+                        tempSocket.Send(sendData);
+                    }
+                    catch (SocketException e)
+                    {
+                        MessageBox.Show(e.Message);
+                        return;
+                    }
                 }
             }
             sendmsg.Text = "";
