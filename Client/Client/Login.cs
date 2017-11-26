@@ -40,9 +40,9 @@ namespace Client
         public void Check_Account()//发送账号信息，验证账号
         {
             byte[] data = new byte[100];
-            data = Encoding.UTF8.GetBytes("LOGIN@LOGIN");
+            data = Encoding.UTF8.GetBytes("LOGIN|LOGIN");
             int i = UsrInfo.NewClient.Send(data);
-            data = Encoding.UTF8.GetBytes(Account.Text + "@" + Password.Text);
+            data = Encoding.UTF8.GetBytes(Account.Text + "|" + Password.Text);
             i = UsrInfo.NewClient.Send(data);
 
             byte[] temp = new byte[100];
@@ -65,14 +65,27 @@ namespace Client
         public void Register()//发送注册信息
         {
             byte[] data = new byte[100];
-            data = Encoding.UTF8.GetBytes("REGISTER@123");
+            data = Encoding.UTF8.GetBytes("REGISTER|REGISTER");
             int i = UsrInfo.NewClient.Send(data);
-            data = Encoding.UTF8.GetBytes(Account.Text + "@" + Password.Text);
+            data = Encoding.UTF8.GetBytes(Account.Text + "|" + Password.Text);
             i = UsrInfo.NewClient.Send(data);
-            this.Hide();//隐藏注册界面
-            UsrInfo.Account = Account.Text;
-            ChatForm ChatForm = new ChatForm();
-            ChatForm.Show();
+
+            byte[] temp = new byte[100];
+            int recv = UsrInfo.NewClient.Receive(temp);
+            string stringdata = Encoding.UTF8.GetString(temp, 0, recv);
+            if (stringdata == "YES")
+            {
+                this.Hide();//隐藏注册界面
+                UsrInfo.Account = Account.Text;
+                ChatForm ChatForm = new ChatForm();
+                ChatForm.Show();
+            }
+            else
+            {
+                tip.Text = "该账号已被注册，请再次尝试";
+                Account.Text = "";
+                Password.Text = "";
+            }
         }
         private void Login_Bt_Click(object sender, EventArgs e)
         {
@@ -88,7 +101,7 @@ namespace Client
         private void Login_FormClosed(object sender, FormClosedEventArgs e)
         {
             byte[] data = new byte[4];
-            data = System.Text.Encoding.Default.GetBytes("STOP@STOP");
+            data = System.Text.Encoding.Default.GetBytes("STOP|STOP");
             int i = UsrInfo.NewClient.Send(data);
             UsrInfo.NewClient.Close();
         }

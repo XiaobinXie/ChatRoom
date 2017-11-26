@@ -34,7 +34,7 @@ namespace Client
                 int recv = Chat_Client.Receive(data);
                 string stringdata = Encoding.UTF8.GetString(data, 0, recv);
                 SpareMsg(stringdata);
-                ShowMsg(msg1 +":"+msg2+ "\r\n");
+                ShowMsg(msg1 +"："+msg2+ "\r\n");
             }
         }
         public void ShowMsg(string msg)//显示消息
@@ -54,15 +54,27 @@ namespace Client
         public void SpareMsg(string receive_msg)//分离账号和消息
         {
             string[] temp =new string[2];
-            temp = receive_msg.Split('@');
+            temp = receive_msg.Split('|');
             msg1 = temp[0];
-            msg2 = temp[1];
+            if (temp.Length == 1)
+            {
+                msg2 = temp[1];
+            }
+            else if(temp.Length > 1)
+            {
+                msg2 = null;
+                for(int i=1;i<temp.Length; i++)
+                {
+                    msg2 += temp[i];
+                }
+            }
+            else msg2 = null;
         }
         private void Send_Click(object sender, EventArgs e)//发送触发的事件
         {
             int m_length = MsgToSend.Text.Length;
             byte[] data = new byte[m_length];
-            data = Encoding.UTF8.GetBytes(account+"@"+MsgToSend.Text);
+            data = Encoding.UTF8.GetBytes(account+"|"+MsgToSend.Text);
             int i = Chat_Client.Send(data);
             ShowMsg(account + "：" + MsgToSend.Text + "\r\n");
             MsgToSend.Text = "";
@@ -71,7 +83,7 @@ namespace Client
         private void ChatForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             byte[] data = new byte[4];
-            data = System.Text.Encoding.Default.GetBytes("STOP@"+ account);
+            data = System.Text.Encoding.Default.GetBytes("STOP|"+ account);
             int i = Chat_Client.Send(data);
             Chat_Client.Close();
         }

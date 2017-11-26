@@ -38,14 +38,25 @@ namespace TCPServer
         public UsrInfo[] FILE = new UsrInfo[100];//用户信息
         public int count = 0;
 
-        public void register(string nickname, string Password, Socket tempSocket)//注册
+        public bool register(string nickname, string Password, Socket tempSocket)//注册
         {
-            FILE[count].Account = nickname;
-            FILE[count].Password = Password;
-            FILE[count].UsrSocket = tempSocket;
-            FILE[count].Connected = 1;
-            count++;
-            WriteFile();
+            int i;
+            bool x=false;
+            for(i = 0; i < count; i++)
+            {
+                if (FILE[i].Account == nickname) break;
+            }
+            if (i >= count)
+            {
+                FILE[count].Account = nickname;
+                FILE[count].Password = Password;
+                FILE[count].UsrSocket = tempSocket;
+                FILE[count].Connected = 1;
+                count++;
+                WriteFile();
+                x=true;
+            }
+            return x;
         }
         public bool login(string nickname, string Password, Socket tempSocket)//验证登陆
         {
@@ -53,7 +64,7 @@ namespace TCPServer
             for (int i = 0;i<count ; i++)
             {
                 if (FILE[i].Account == null) break;
-                else if (FILE[i].Account == nickname && FILE[i].Password == Password)
+                else if (FILE[i].Connected==0&&FILE[i].Account == nickname && FILE[i].Password == Password)
                 {
                     temp = true;
                     FILE[i].UsrSocket = tempSocket;
@@ -71,7 +82,7 @@ namespace TCPServer
             string[] temp = new string[2];
             while ((line = sr.ReadLine()) != null)
             {
-                temp = line.ToString().Split('@');
+                temp = line.ToString().Split('|');
                 FILE[count].Account = temp[0];
                 FILE[count].Password = temp[1];
                 FILE[count].Connected = 0;
@@ -87,7 +98,7 @@ namespace TCPServer
             StreamWriter fs = new StreamWriter(path);
             for(int i = 0; i < count; i++)
             {
-                string UsrInfo = FILE[i].Account+"@"+FILE[i].Password;
+                string UsrInfo = FILE[i].Account+"|"+FILE[i].Password;
                 fs.WriteLine(UsrInfo);
             }
             fs.Flush();
@@ -125,20 +136,18 @@ namespace TCPServer
                 showinfo.AppendText(msg);
             }
         }
-        /*public void userListOperate(string msg)//后期可能会添加的客户端信息列表
+        public void userListOperate(string msg)//后期可能会添加的客户端信息列表
         {
-            //在线程里以安全方式调用控件
-            if (userList.InvokeRequired)
+            if (UsrList.InvokeRequired)
             {
-                MyInvoke _myinvoke = new MyInvoke(userListOperate);
-                userList.Invoke(_myinvoke, new object[] { msg });
+                MyInvoke _myinvoke = new MyInvoke(showClientMsg);
+                UsrList.Invoke(_myinvoke, new object[] { msg });
             }
             else
             {
-                userList.Items.Add(msg);
+                UsrList.AppendText(msg);
             }
-        }*/
-        
+        }
 
         /*监听客户端及接受消息*/
         
@@ -183,27 +192,28 @@ namespace TCPServer
             while (a)
             {
                 Spare(tempSocket);
-                if (msg1 == "LOGIN")
+                if (msg2 != null)
                 {
-                    tip.Text = "1";
-                    Spare(tempSocket);
-                    if (login(msg1, msg2, tempSocket))
+                    if (msg1 == "LOGIN")
                     {
-                        tempSocket.SendTo(YES, remote);
-                        tip.Text = "2";
-                        a = false;
+                        Spare(tempSocket);
+                        if (login(msg1, msg2, tempSocket))
+                        {
+                            tempSocket.SendTo(YES, remote);
+                            a = false;
+                        }
+                        else Client.SendTo(NO, remote);
                     }
-                    else{
-                        Client.SendTo(NO, remote);
-                        tip.Text = "3";
+                    else if (msg1 == "REGISTER")
+                    {
+                        Spare(tempSocket);
+                        if(register(msg1, msg2, tempSocket))
+                        {
+                            tempSocket.SendTo(YES, remote);
+                            a = false;
+                        }
+                        else Client.SendTo(NO, remote);
                     }
-                }
-                else if (msg1 == "REGISTER")
-                {
-                    Spare(tempSocket);
-                    register(msg1, msg2, tempSocket);
-                    //WriteFile();
-                    a = false;
                 }
                 else
                 {
@@ -211,10 +221,10 @@ namespace TCPServer
                     break;
                 }
             }
-
+           
             //将要发送给连接上来的客户端的提示字符串
             DateTimeOffset now = DateTimeOffset.Now;
-            string strDateLine = "管理员@"+msg1+"，欢迎登录到服务器!";
+            string strDateLine = "管理员|"+msg1+"，欢迎登录到服务器!";
             Byte[] byteDateLine = System.Text.Encoding.UTF8.GetBytes(strDateLine);
 
             //将提示信息发送给客户端,并在服务端显示连接信息。
@@ -228,12 +238,12 @@ namespace TCPServer
             {
                 Spare(tempSocket);
                 string ip = tempSocket.RemoteEndPoint.ToString();//获取客户端的IP和端口
-                if (msg1 == "STOP")//当客户端终止连接时，消息格式：STOP@账户名
+                if (msg1 == "STOP")//当客户端终止连接时，消息格式：STOP|账户名
                 {
                     showClientMsg(msg2 + now.ToString("G") + "  " + "已从服务器断开" + "\r\n");
                     setStatus(msg2, 0);
+                    tempSocket.Shutdown(SocketShutdown.Both);
                     tempSocket.Close();
-                    tip.Text = "6";
                     break;
                 }
                 showClientMsg(ip + "  " + now.ToString("G") + "   " + msg2 + "\r\n");//显示客户端发送过来的信息
@@ -241,32 +251,36 @@ namespace TCPServer
             }
             if (flag == 0)
             {
+                tempSocket.Shutdown(SocketShutdown.Both);
                 tempSocket.Close();
             }          
         }
         public void Spare(Socket tempSocket)//分离账号及消息
         {
             byte[] data = new byte[1024];
-            int recv;
-            try
-            {
-                recv = tempSocket.Receive(data);
-            }
-            catch (SocketException e)
-            {
-                MessageBox.Show(e.Message);
-                return;
-            }
+            int recv = tempSocket.Receive(data);
             string stringdata = Encoding.UTF8.GetString(data, 0, recv);
-            string[] temp = stringdata.Split('@');
-                msg1 = temp[0];
-                msg2 = temp[1];
+            string[] temp = stringdata.Split('|');
+            msg1 = temp[0];
+            if (temp.Length == 1)
+            {
+                msg2 = null;
+            }
+            else if (temp.Length > 1)
+            {
+                msg2 = null;
+                for (int i = 1; i < temp.Length; i++)
+                {
+                    msg2 += temp[i];
+                }
+            }
+            else msg2 = null;
         }
         
         public void SendBroadMsg()//发送广播消息
         {
             string strDataLine = sendmsg.Text;
-            Byte[] sendData = Encoding.UTF8.GetBytes("管理员"+"@"+strDataLine);
+            Byte[] sendData = Encoding.UTF8.GetBytes("管理员"+"|"+strDataLine);
             
             for(int i=0;i<count;i++)
             {
@@ -291,7 +305,7 @@ namespace TCPServer
         {
             for(int i=0;i<count;i++)
             {
-                msg = msg1 + "@"+msg2;
+                msg = msg1 + "|"+msg2;
                 Byte[] sendData = Encoding.UTF8.GetBytes(msg);
                 if (FILE[i].Account != client_name && FILE[i].Connected==1)
                 {

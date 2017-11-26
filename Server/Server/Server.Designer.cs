@@ -36,7 +36,7 @@
             this.statuBar = new System.Windows.Forms.ToolStripStatusLabel();
             this.send = new System.Windows.Forms.Button();
             this.sendmsg = new System.Windows.Forms.TextBox();
-            this.tip = new System.Windows.Forms.Label();
+            this.UsrList = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,11 +60,11 @@
             // showinfo
             // 
             this.showinfo.BackColor = System.Drawing.SystemColors.Window;
-            this.showinfo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.showinfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.showinfo.Cursor = System.Windows.Forms.Cursors.No;
             this.showinfo.Location = new System.Drawing.Point(20, 58);
             this.showinfo.Name = "showinfo";
-            this.showinfo.Size = new System.Drawing.Size(469, 301);
+            this.showinfo.Size = new System.Drawing.Size(376, 301);
             this.showinfo.TabIndex = 2;
             this.showinfo.Text = "";
             // 
@@ -82,9 +82,9 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.statuBar});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 442);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 404);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(501, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(522, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -111,21 +111,22 @@
             this.sendmsg.Size = new System.Drawing.Size(376, 21);
             this.sendmsg.TabIndex = 6;
             // 
-            // tip
+            // UsrList
             // 
-            this.tip.AutoSize = true;
-            this.tip.Location = new System.Drawing.Point(169, 17);
-            this.tip.Name = "tip";
-            this.tip.Size = new System.Drawing.Size(0, 12);
-            this.tip.TabIndex = 9;
+            this.UsrList.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.UsrList.Location = new System.Drawing.Point(401, 58);
+            this.UsrList.Multiline = true;
+            this.UsrList.Name = "UsrList";
+            this.UsrList.Size = new System.Drawing.Size(100, 301);
+            this.UsrList.TabIndex = 10;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(501, 464);
-            this.Controls.Add(this.tip);
+            this.BackColor = System.Drawing.SystemColors.Menu;
+            this.ClientSize = new System.Drawing.Size(522, 426);
+            this.Controls.Add(this.UsrList);
             this.Controls.Add(this.sendmsg);
             this.Controls.Add(this.send);
             this.Controls.Add(this.statusStrip1);
@@ -133,7 +134,10 @@
             this.Controls.Add(this.showinfo);
             this.Controls.Add(this.serverport);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "服务器";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -154,7 +158,7 @@
         private System.Windows.Forms.ToolStripStatusLabel statuBar;
         private System.Windows.Forms.Button send;
         private System.Windows.Forms.TextBox sendmsg;
-        private System.Windows.Forms.Label tip;
+        private System.Windows.Forms.TextBox UsrList;
     }
 }
 
